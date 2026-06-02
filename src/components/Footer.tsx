@@ -40,15 +40,15 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="font-semibold mb-4">联系我们</h3>
             <ul className="space-y-2 text-gray-400 text-sm">
-              <li>邮箱：contact@ai-expense.com</li>
-              <li>电话：400-888-8888</li>
-              <li>地址：北京市朝阳区科技园区</li>
+              <li>邮箱：suh@sawell.cn</li>
+              <li>电话：028-123112</li>
+              <li>地址：四川省成都市青羊区江汉路182号纺织大厦3楼</li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
-          <p>&copy; 2024 AI报销系统. 保留所有权利.</p>
+          <p>&copy; 2026 四川恒信赛威科技有限公司，保留所有权利</p>
         </div>
       </div>
     </footer>

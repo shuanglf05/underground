@@ -411,14 +411,14 @@ const PartnerForm: React.FC = () => {
             <div>
               <h3 style={{ fontWeight: '600', marginBottom: '16px' }}>联系我们</h3>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: '#9ca3af', fontSize: '14px' }}>
-                <li style={{ marginBottom: '8px' }}>邮箱：contact@ai-expense.com</li>
-                <li style={{ marginBottom: '8px' }}>电话：400-888-8888</li>
-                <li style={{ marginBottom: '8px' }}>地址：北京市朝阳区科技园区</li>
+                <li style={{ marginBottom: '8px' }}>邮箱：suh@sawell.cn</li>
+                <li style={{ marginBottom: '8px' }}>电话：028-123112</li>
+                <li style={{ marginBottom: '8px' }}>地址：四川省成都市青羊区江汉路182号纺织大厦3楼</li>
               </ul>
             </div>
           </div>
           <div style={{ borderTop: '1px solid #374151', paddingTop: '32px', textAlign: 'center', color: '#9ca3af', fontSize: '14px' }}>
-            <p>© 2024 赛威报销. 保留所有权利.</p>
+            <p>© 2026 四川恒信赛威科技有限公司，保留所有权利</p>
           </div>
         </div>
       </footer>

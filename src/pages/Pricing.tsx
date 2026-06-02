@@ -390,14 +390,14 @@ const Pricing: React.FC = () => {
             <div>
               <h3 style={{ fontWeight: '600', marginBottom: '16px', fontSize: '15px' }}>联系我们</h3>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                <li style={{ marginBottom: '10px', color: '#9ca3af', fontSize: '14px' }}>邮箱：contact@ai-expense.com</li>
-                <li style={{ marginBottom: '10px', color: '#9ca3af', fontSize: '14px' }}>电话：400-888-8888</li>
-                <li style={{ marginBottom: '10px', color: '#9ca3af', fontSize: '14px' }}>地址：北京市朝阳区科技园区</li>
+                <li style={{ marginBottom: '10px', color: '#9ca3af', fontSize: '14px' }}>邮箱：suh@sawell.cn</li>
+                <li style={{ marginBottom: '10px', color: '#9ca3af', fontSize: '14px' }}>电话：028-123112</li>
+                <li style={{ marginBottom: '10px', color: '#9ca3af', fontSize: '14px' }}>地址：四川省成都市青羊区江汉路182号纺织大厦3楼</li>
               </ul>
             </div>
           </div>
           <div style={{ borderTop: '1px solid #374151', paddingTop: '24px', textAlign: 'center' }}>
-            <p style={{ color: '#6b7280', fontSize: '13px' }}>© 2024 赛威报销. 保留所有权利.</p>
+            <p style={{ color: '#6b7280', fontSize: '13px' }}>© 2026 四川恒信赛威科技有限公司，保留所有权利</p>
           </div>
         </div>
       </footer>
