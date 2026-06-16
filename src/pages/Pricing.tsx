@@ -354,18 +354,12 @@ const Pricing: React.FC = () => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '40px', marginBottom: '48px' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-                <div style={{
-                  width: '36px',
-                  height: '36px',
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
-                  borderRadius: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <span style={{ color: 'white', fontWeight: 'bold', fontSize: '16px' }}>AI</span>
-                </div>
-                <span style={{ fontSize: '20px', fontWeight: '700' }}>赛威报销</span>
+                <img 
+                  src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=duzhiyun%20cloud%20logo%20blue%20gradient%20minimalist%20clean%20white%20background&image_size=square" 
+                  alt="度支云智慧报销系统"
+                  style={{ width: '36px', height: '36px', objectFit: 'contain', backgroundColor: 'white', padding: '2px', borderRadius: '8px' }}
+                />
+                <span style={{ fontSize: '20px', fontWeight: '700' }}>度支云智慧报销系统</span>
               </div>
               <p style={{ color: '#9ca3af', fontSize: '14px', lineHeight: '1.6' }}>
                 智能AI对话报销系统，让报销更简单、更高效。
@@ -376,7 +370,6 @@ const Pricing: React.FC = () => {
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 <li style={{ marginBottom: '10px' }}><a href="/" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '14px' }}>首页</a></li>
                 <li style={{ marginBottom: '10px' }}><a href="/pricing" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '14px' }}>定价方案</a></li>
-                <li style={{ marginBottom: '10px' }}><a href="/partner" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '14px' }}>成为分销商</a></li>
               </ul>
             </div>
             <div>
@@ -385,19 +378,31 @@ const Pricing: React.FC = () => {
                 <li style={{ marginBottom: '10px' }}><a href="/help/getting-started" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '14px' }}>入门指引</a></li>
                 <li style={{ marginBottom: '10px' }}><a href="/help/manual" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '14px' }}>操作手册</a></li>
                 <li style={{ marginBottom: '10px' }}><a href="/help/api" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '14px' }}>API文档</a></li>
+                <li style={{ marginBottom: '10px' }}><a  style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '14px' }} onClick={() => setShowPartnerModal(true)}>成为分销商</a></li>
+
               </ul>
             </div>
             <div>
               <h3 style={{ fontWeight: '600', marginBottom: '16px', fontSize: '15px' }}>联系我们</h3>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
+                <img 
+                  src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20business%20man%20headshot%20portrait%20formal%20ID%20photo%20clean%20background&image_size=portrait_4_3" 
+                  alt="联系人"
+                  style={{ width: '48px', height: '56px', objectFit: 'cover', borderRadius: '8px', border: '2px solid #374151' }}
+                />
+                <div>
+                  <p style={{ color: 'white', fontWeight: '500' }}>苏恒</p>
+                  <p style={{ color: '#9ca3af', fontSize: '13px' }}>四川恒信赛威科技有限公司</p>
+                </div>
+              </div>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                <li style={{ marginBottom: '10px', color: '#9ca3af', fontSize: '14px' }}>邮箱：suh@sawell.cn</li>
-                <li style={{ marginBottom: '10px', color: '#9ca3af', fontSize: '14px' }}>电话：028-123112</li>
-                <li style={{ marginBottom: '10px', color: '#9ca3af', fontSize: '14px' }}>地址：四川省成都市青羊区江汉路182号纺织大厦3楼</li>
+                <li style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '8px' }}>电话：028-64269361</li>
               </ul>
             </div>
           </div>
           <div style={{ borderTop: '1px solid #374151', paddingTop: '24px', textAlign: 'center' }}>
-            <p style={{ color: '#6b7280', fontSize: '13px' }}>© 2026 四川恒信赛威科技有限公司，保留所有权利</p>
+            <p style={{ color: '#6b7280', fontSize: '13px' }}>© 2026 四川恒信赛威科技有限公司旗下产品</p>
+            <p style={{ color: '#6b7280', fontSize: '13px', marginTop: '4px' }}>蜀ICP备2023020652号-1</p>
           </div>
         </div>
       </footer>

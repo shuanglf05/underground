@@ -24,7 +24,7 @@ const GettingStarted: React.FC = () => {
             <ol style={{ color: '#374151', lineHeight: '1.8' }}>
               <li style={{ marginBottom: '12px' }}>点击右上角的"登录｜注册"按钮</li>
               <li style={{ marginBottom: '12px' }}>填写您的企业信息和联系方式</li>
-              <li style={{ marginBottom: '12px' }}>验证您的邮箱地址</li>
+              
               <li>完成注册，开始使用</li>
             </ol>
           </div>

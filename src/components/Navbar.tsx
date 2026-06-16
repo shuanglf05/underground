@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, ChevronDown, User, Briefcase, BookOpen } from 'lucide-react';
+import { Menu, X, ChevronDown, BookOpen } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,13 +12,15 @@ const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">AI</span>
-            </div>
-            <span className="text-xl font-bold text-gray-900">赛威报销</span>
+            <img 
+              src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=duzhiyun%20cloud%20logo%20blue%20gradient%20minimalist%20clean%20white%20background&image_size=square" 
+              alt="度支云智慧报销系统"
+              className="w-10 h-10 object-contain bg-white p-0.5 rounded"
+            />
+            <span className="text-xl font-bold text-gray-900">度支云智慧报销系统</span>
           </Link>
 
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             <Link to="/" className="text-gray-700 hover:text-primary transition-colors">
               首页
             </Link>
@@ -82,24 +84,6 @@ const Navbar: React.FC = () => {
                 </div>
               )}
             </div>
-
-            <a 
-              href="https://app.ai-expense.com/login" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center space-x-1 text-gray-700 hover:text-primary transition-colors"
-            >
-              <User className="w-4 h-4" />
-              <span>登录｜注册</span>
-            </a>
-
-            <Link 
-              to="/partner" 
-              className="flex items-center space-x-2 bg-gradient-primary text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
-            >
-              <Briefcase className="w-4 h-4" />
-              <span>成为分销商</span>
-            </Link>
           </div>
 
           <button 
@@ -108,6 +92,17 @@ const Navbar: React.FC = () => {
           >
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
+          <a 
+              href="#" 
+              className="p-1.5 bg-white rounded-full border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all"
+              title="AI助手"
+            >
+              <img 
+                src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=female%20AI%20robot%20avatar%20blue%20purple%20headset%20cyber%20rounded%20circle%20icon%20clean%20white%20background&image_size=square" 
+                alt="AI助手"
+                className="w-8 h-8 object-contain"
+              />
+            </a>
         </div>
 
         {isMenuOpen && (
@@ -157,21 +152,6 @@ const Navbar: React.FC = () => {
                 API文档
               </Link>
             </div>
-            <a 
-              href="https://app.ai-expense.com/login" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="block py-2 text-gray-700 hover:text-primary"
-            >
-              登录｜注册
-            </a>
-            <Link 
-              to="/partner" 
-              className="block mt-2 bg-gradient-primary text-white px-4 py-2 rounded-lg text-center hover:opacity-90 transition-opacity"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              成为分销商
-            </Link>
           </div>
         )}
       </div>

@@ -8,7 +8,7 @@ const GettingStarted: React.FC = () => {
   const steps = [
     {
       title: '1. 注册账号',
-      content: '访问AI报销系统官网，点击右上角"注册"按钮，填写企业信息和管理员账号，完成邮箱验证后即可登录。'
+      content: '访问AI报销系统官网，点击右上角"注册"按钮，填写企业信息和管理员账号即可登录。'
     },
     {
       title: '2. 企业认证',
