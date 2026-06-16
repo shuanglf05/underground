@@ -24,6 +24,7 @@ export default defineConfig({
     }), 
     tsconfigPaths(),
   ],
+  base: '/underground/',
   server: {
     proxy: {
       '/api': {
