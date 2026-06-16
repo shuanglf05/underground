@@ -1,5 +1,5 @@
 import { db } from '../config/database.js';
-import { ApiResponse, User, Role } from '../../../shared/types/index.js';
+import { ApiResponse, User, Role, PaginatedResponse } from '../../../shared/types/index.js';
 
 class UserService {
   // 获取用户列表
@@ -50,9 +50,9 @@ class UserService {
       name: data.name,
       password: data.password,
       roleId: data.roleId,
-      roleName: role.name,
+      role: role.name,
       createdAt: new Date().toISOString().split('T')[0],
-      status: 'active',
+      status: 1,
     };
 
     db.users.push(newUser);
@@ -76,7 +76,7 @@ class UserService {
     if (data.roleId) {
       const role = db.roles.find(r => r.id === data.roleId);
       if (role) {
-        data.roleName = role.name;
+        data.role = role.name;
       }
     }
 

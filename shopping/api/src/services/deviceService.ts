@@ -1,5 +1,5 @@
 import { db } from '../config/database.js';
-import { ApiResponse, Device, DeviceStatus } from '../../../shared/types/index.js';
+import { ApiResponse, Device, DeviceStatus, PaginatedResponse } from '../../../shared/types/index.js';
 
 class DeviceService {
   // 获取设备列表
@@ -105,6 +105,7 @@ class DeviceService {
   addDevice(data: { name: string; type: string; location: string }): ApiResponse<Device> {
     const newDevice: Device = {
       id: Date.now(),
+      code: `${data.type.toUpperCase()}-${Date.now()}`,
       name: data.name,
       type: data.type,
       location: data.location,
@@ -148,10 +149,11 @@ class DeviceService {
     }
 
     let successCount = 0;
-    devices.forEach(deviceData => {
+    devices.forEach((deviceData, index) => {
       if (deviceData.name && deviceData.type) {
         const newDevice: Device = {
-          id: Date.now() + Math.random(),
+          id: Date.now() + index,
+          code: `${deviceData.type.toUpperCase()}-${Date.now()}-${index}`,
           name: deviceData.name,
           type: deviceData.type,
           location: deviceData.location || '',

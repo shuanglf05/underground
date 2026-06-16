@@ -1,5 +1,5 @@
 import { db } from '../config/database.js';
-import { Bracelet, ApiResponse, BraceletStatus } from '../../../shared/types/index.js';
+import { Bracelet, ApiResponse, BraceletStatus, PaginatedResponse } from '../../../shared/types/index.js';
 
 class BraceletService {
   // 获取手环列表

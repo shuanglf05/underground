@@ -55,6 +55,7 @@ export const memberApi = {
   create: (data: Partial<Member>) => request<Member>('/members', { method: 'POST', body: JSON.stringify(data) }),
   update: (id: number, data: Partial<Member>) => request<Member>(`/members/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   recharge: (id: number, amount: number) => request<Member>(`/members/${id}/recharge`, { method: 'POST', body: JSON.stringify({ amount }) }),
+  updateBalance: (id: number, amount: number) => request<Member>(`/members/${id}/recharge`, { method: 'POST', body: JSON.stringify({ amount }) }),
 };
 
 // 订单API

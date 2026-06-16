@@ -26,6 +26,8 @@ export enum OrderStatus {
   USED = 'used',
   CANCELLED = 'cancelled',
   EXPIRED = 'expired',
+  VERIFIED = 'verified',
+  REFUNDED = 'refunded',
 }
 
 // 手环状态枚举
@@ -73,6 +75,7 @@ export interface Member {
   level: MemberLevel;
   balance: number;
   points: number;
+  totalConsumption?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -85,6 +88,7 @@ export interface Ticket {
   price: number;
   rights: TicketRights;
   validDays: number;
+  description?: string;
   status: number;
   createdAt: string;
 }
@@ -110,6 +114,8 @@ export interface Order {
   payStatus: PayStatus;
   payMethod?: string;
   status: OrderStatus;
+  channel?: string;
+  refundReason?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -176,16 +182,37 @@ export interface Bill {
   createdAt: string;
 }
 
+// 角色接口
+export interface Role {
+  id: number;
+  name: string;
+  permissions: string[];
+  description?: string;
+  createdAt: string;
+}
+
 // 系统用户接口
 export interface SystemUser {
   id: number;
   username: string;
+  password?: string;
   name: string;
   role: string;
+  roleId?: number;
   phone?: string;
   email?: string;
   status: number;
   createdAt: string;
+}
+
+// 用户接口（别名）
+export type User = SystemUser;
+
+// 设备状态枚举
+export enum DeviceStatus {
+  ONLINE = 'online',
+  OFFLINE = 'offline',
+  ERROR = 'error',
 }
 
 // 设备接口
@@ -194,9 +221,13 @@ export interface Device {
   code: string;
   name: string;
   type: string;
-  status: 'online' | 'offline' | 'error';
+  status: DeviceStatus | 'online' | 'offline' | 'error';
   location: string;
   lastHeartbeat?: string;
+  usageCount?: number;
+  errorCount?: number;
+  totalUsageHours?: number;
+  lastMaintenance?: string;
 }
 
 // 公告接口

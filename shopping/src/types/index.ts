@@ -85,6 +85,7 @@ export interface Ticket {
   price: number;
   rights: TicketRights;
   validDays: number;
+  description?: string;
   status: number;
   createdAt: string;
 }

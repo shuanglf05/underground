@@ -14,6 +14,7 @@ interface AppState {
   membersLoading: boolean;
   fetchMembers: (params?: { page?: number; pageSize?: number; keyword?: string }) => Promise<void>;
   fetchMemberById: (id: number) => Promise<void>;
+  updateMemberBalance: (memberId: number, amount: number) => Promise<void>;
 
   // 订单
   orders: Order[];
@@ -80,6 +81,19 @@ export const useStore = create<AppState>((set, get) => ({
     const res = await memberApi.getById(id);
     if (res.success && res.data) {
       set({ currentMember: res.data });
+    }
+  },
+  updateMemberBalance: async (memberId, amount) => {
+    const res = await memberApi.updateBalance(memberId, amount);
+    if (res.success) {
+      set((state) => ({
+        members: state.members.map((m) =>
+          m.id === memberId ? { ...m, balance: m.balance + amount } : m
+        ),
+        currentMember: state.currentMember?.id === memberId
+          ? { ...state.currentMember, balance: state.currentMember.balance + amount }
+          : state.currentMember,
+      }));
     }
   },
 

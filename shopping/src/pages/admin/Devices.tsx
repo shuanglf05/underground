@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
-import { Cpu, Power, PowerOff, RotateCcw, AlertTriangle, Plus, Search, RefreshCw } from 'lucide-react';
+import { Cpu, Power, PowerOff, RotateCcw, AlertTriangle, Plus, Search, RefreshCw, X } from 'lucide-react';
 
 interface Device {
   id: number;
