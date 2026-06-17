@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测试页面</title>
+  <script>
+    console.log('Test HTML loaded');
+    document.addEventListener('DOMContentLoaded', function() {
+      const root = document.getElementById('root');
+      if (root) {
+        root.innerHTML = '<h1 style="color: blue;">测试成功！JavaScript正常工作</h1>';
+        console.log('Content inserted successfully');
+      } else {
+        console.error('Root element not found');
+      }
+    });
+  </script>
+</head>
+<body>
+  <div id="root"></div>
+</body>
+</html>

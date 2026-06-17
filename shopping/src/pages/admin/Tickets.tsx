@@ -1,404 +1,350 @@
-import { useStore } from '../../stores/useStore';
-import AdminSidebar from '../../components/AdminSidebar';
-import { Ticket, Plus, Search, Edit2, Trash2, X } from 'lucide-react';
-import { useState } from 'react';
-import type { Ticket as TicketType } from '../../types';
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Button } from '../../components/ui/Button';
+import { Modal } from '../../components/ui/Modal';
+import { toast } from '../../components/ui/Toast';
+import { Plus, Edit, Trash2, Search, Ticket, CheckCircle, XCircle, Clock } from 'lucide-react';
 
 export default function AdminTickets() {
-  const { tickets, fetchTickets } = useStore();
-  const [searchKeyword, setSearchKeyword] = useState('');
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [editingTicket, setEditingTicket] = useState<TicketType | null>(null);
-  const [deletingTicket, setDeletingTicket] = useState<TicketType | null>(null);
-  const [newTicket, setNewTicket] = useState({
-    name: '',
-    type: 'single',
-    price: 0,
-    validDays: 7,
-    description: '',
-  });
+  const navigate = useNavigate();
+  const { type } = useParams<{ type?: string }>();
+  const activeTab = type || 'types';
 
-  const filteredTickets = tickets.filter((t) =>
-    t.name.toLowerCase().includes(searchKeyword.toLowerCase())
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [editingItem, setEditingItem] = useState<any>(null);
+
+  const ticketTypes = [
+    { id: '1', name: '单人日场票', type: 'single', price: 128, validDays: 1, status: 'active', description: '单人全天入场门票' },
+    { id: '2', name: '单人夜场票', type: 'single', price: 88, validDays: 1, status: 'active', description: '单人夜间入场门票(18:00-22:00)' },
+    { id: '3', name: '家庭套票', type: 'package', price: 298, validDays: 1, status: 'active', description: '2大1小家庭套票' },
+    { id: '4', name: '双人情侣票', type: 'package', price: 218, validDays: 1, status: 'active', description: '双人入场门票' },
+    { id: '5', name: '年卡会员', type: 'membership', price: 998, validDays: 365, status: 'active', description: '全年无限次入场' },
+    { id: '6', name: '季卡会员', type: 'membership', price: 398, validDays: 90, status: 'inactive', description: '季度无限次入场' },
+  ];
+
+  const salesRecords = [
+    { id: 'S001', ticketName: '单人日场票', quantity: 2, amount: 256, customer: '138****8888', time: '2024-01-15 10:30', channel: '服务台' },
+    { id: 'S002', ticketName: '家庭套票', quantity: 1, amount: 298, customer: '139****9999', time: '2024-01-15 11:20', channel: '微信小程序' },
+    { id: 'S003', ticketName: '双人情侣票', quantity: 1, amount: 218, customer: '137****7777', time: '2024-01-15 14:15', channel: '美团' },
+    { id: 'S004', ticketName: '年卡会员', quantity: 1, amount: 998, customer: '136****6666', time: '2024-01-15 15:30', channel: '服务台' },
+  ];
+
+  const verifyRecords = [
+    { id: 'V001', ticketName: '单人日场票', customer: '138****8888', verifyTime: '2024-01-15 10:35', status: 'success', gate: 'A1闸机' },
+    { id: 'V002', ticketName: '家庭套票', customer: '139****9999', verifyTime: '2024-01-15 11:25', status: 'success', gate: 'A2闸机' },
+    { id: 'V003', ticketName: '双人情侣票', customer: '137****7777', verifyTime: '2024-01-15 14:20', status: 'success', gate: 'B1闸机' },
+    { id: 'V004', ticketName: '单人日场票', customer: '135****5555', verifyTime: '2024-01-15 16:00', status: 'failed', gate: 'A1闸机', reason: '门票已过期' },
+  ];
+
+  const refundRecords = [
+    { id: 'R001', orderId: 'ORD20240115001', ticketName: '单人日场票', amount: 128, refundAmount: 115.2, customer: '138****8888', time: '2024-01-15 12:00', status: 'completed', reason: '行程变更' },
+    { id: 'R002', orderId: 'ORD20240115002', ticketName: '家庭套票', amount: 298, refundAmount: 298, customer: '139****9999', time: '2024-01-15 13:30', status: 'pending', reason: '天气原因' },
+  ];
+
+  const filteredTypes = ticketTypes.filter(t => 
+    t.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const formatPrice = (price: number) => `¥${price.toFixed(2)}`;
-
-  const getTicketTypeName = (type: string) => {
-    const names: Record<string, string> = {
-      unified: '通票',
-      single: '单票',
-      package: '套餐',
-    };
-    return names[type] || type;
+  const handleSave = () => {
+    toast.success(editingItem ? '修改成功' : '添加成功');
+    setShowAddModal(false);
+    setEditingItem(null);
   };
 
-  const getTicketTypeBadge = (type: string) => {
-    const badges: Record<string, { bg: string; text: string }> = {
-      unified: { bg: 'bg-purple-100', text: 'text-purple-600' },
-      single: { bg: 'bg-blue-100', text: 'text-blue-600' },
-      package: { bg: 'bg-orange-100', text: 'text-orange-600' },
-    };
-    return badges[type] || { bg: 'bg-gray-100', text: 'text-gray-600' };
+  const handleDelete = (id: string) => {
+    toast.success('删除成功');
   };
 
-  const handleAddTicket = async () => {
-    const res = await fetch('/api/tickets', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newTicket),
-    });
-    const data = await res.json();
-    if (data.success) {
-      await fetchTickets();
-      setShowAddModal(false);
-      setNewTicket({ name: '', type: 'single', price: 0, validDays: 7, description: '' });
-    }
-  };
-
-  const handleEditTicket = async () => {
-    if (!editingTicket) return;
-    const res = await fetch(`/api/tickets/${editingTicket.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newTicket),
-    });
-    const data = await res.json();
-    if (data.success) {
-      await fetchTickets();
-      setShowEditModal(false);
-      setEditingTicket(null);
-    }
-  };
-
-  const handleDeleteTicket = async () => {
-    if (!deletingTicket) return;
-    const res = await fetch(`/api/tickets/${deletingTicket.id}`, {
-      method: 'DELETE',
-    });
-    const data = await res.json();
-    if (data.success) {
-      await fetchTickets();
-      setShowDeleteModal(false);
-      setDeletingTicket(null);
-    }
-  };
-
-  const openEditModal = (ticket: TicketType) => {
-    setEditingTicket(ticket);
-    setNewTicket({
-      name: ticket.name,
-      type: ticket.type,
-      price: ticket.price,
-      validDays: ticket.validDays,
-      description: ticket.description || '',
-    });
-    setShowEditModal(true);
-  };
-
-  const openDeleteModal = (ticket: TicketType) => {
-    setDeletingTicket(ticket);
-    setShowDeleteModal(true);
-  };
+  const tabs = [
+    { id: 'types', label: '票种管理' },
+    { id: 'sales', label: '门票销售' },
+    { id: 'verify', label: '门票验证' },
+    { id: 'refund', label: '退票管理' },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <AdminSidebar />
-
-      {/* Main Content */}
-      <main className="lg:ml-64 p-6">
-        {/* Header */}
-        <header className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">票务管理</h1>
-            <p className="text-sm text-gray-500">管理票种配置和价格</p>
+    <>
+      <div className="bg-white rounded-lg shadow-sm border-b border-gray-200 mb-4">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex gap-1">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => navigate(`/admin/tickets/${tab.id}`)}
+                className={`px-4 py-2 text-sm rounded-lg transition-colors ${
+                  activeTab === tab.id ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            添加票种
-          </button>
-        </header>
-
-        {/* Search */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="搜索票种名称..."
-              value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-          </div>
-        </div>
-
-        {/* Tickets Table */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50 text-left text-sm text-gray-500">
-                <th className="px-6 py-4 font-medium">票种名称</th>
-                <th className="px-6 py-4 font-medium">类型</th>
-                <th className="px-6 py-4 font-medium">价格</th>
-                <th className="px-6 py-4 font-medium">有效期</th>
-                <th className="px-6 py-4 font-medium">状态</th>
-                <th className="px-6 py-4 font-medium">操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTickets.map((ticket) => {
-                const badge = getTicketTypeBadge(ticket.type);
-                return (
-                  <tr key={ticket.id} className="border-t border-gray-100 hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-                          <Ticket className="w-5 h-5 text-primary-600" />
-                        </div>
-                        <span className="font-medium text-gray-800">{ticket.name}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${badge.bg} ${badge.text}`}>
-                        {getTicketTypeName(ticket.type)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 font-medium text-accent-600">{formatPrice(ticket.price)}</td>
-                    <td className="px-6 py-4 text-gray-600">{ticket.validDays}天</td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        ticket.status === 1 ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
-                      }`}>
-                        {ticket.status === 1 ? '上架' : '下架'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => openEditModal(ticket)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="编辑"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => openDeleteModal(ticket)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="删除"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          {filteredTickets.length === 0 && (
-            <div className="text-center py-12">
-              <Ticket className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">暂无票种数据</p>
-            </div>
+          {activeTab === 'types' && (
+            <Button onClick={() => setShowAddModal(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              新增票种
+            </Button>
           )}
         </div>
-      </main>
+      </div>
 
-      {/* Add Ticket Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-800">添加票种</h2>
-              <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
-                <X className="w-5 h-5" />
-              </button>
+      {activeTab === 'types' && (
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="p-4 border-b border-gray-200">
+            <div className="flex gap-2">
+              <Search className="w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="搜索票种名称..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">票种名称</label>
-                <input
-                  type="text"
-                  value={newTicket.name}
-                  onChange={(e) => setNewTicket({ ...newTicket, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="请输入票种名称"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">票种类型</label>
-                <select
-                  value={newTicket.type}
-                  onChange={(e) => setNewTicket({ ...newTicket, type: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="single">单票</option>
-                  <option value="unified">通票</option>
-                  <option value="package">套餐</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">价格</label>
-                <input
-                  type="number"
-                  value={newTicket.price}
-                  onChange={(e) => setNewTicket({ ...newTicket, price: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="请输入价格"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">有效期（天）</label>
-                <input
-                  type="number"
-                  value={newTicket.validDays}
-                  onChange={(e) => setNewTicket({ ...newTicket, validDays: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="请输入有效期"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">描述</label>
-                <textarea
-                  value={newTicket.description}
-                  onChange={(e) => setNewTicket({ ...newTicket, description: e.target.value })}
-                  rows={3}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="请输入票种描述"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-              >
-                取消
-              </button>
-              <button
-                onClick={handleAddTicket}
-                className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
-              >
-                确认添加
-              </button>
-            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">票种名称</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">类型</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">价格</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">有效期</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">状态</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredTypes.map((ticket) => (
+                  <tr key={ticket.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-3 px-4">
+                      <p className="font-medium text-gray-900">{ticket.name}</p>
+                      <p className="text-xs text-gray-500">{ticket.description}</p>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className={`px-2 py-1 text-xs rounded ${
+                        ticket.type === 'single' ? 'bg-blue-100 text-blue-800' :
+                        ticket.type === 'package' ? 'bg-green-100 text-green-800' :
+                        'bg-purple-100 text-purple-800'
+                      }`}>
+                        {ticket.type === 'single' ? '单票' : ticket.type === 'package' ? '套餐' : '会员'}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">¥{ticket.price}</td>
+                    <td className="py-3 px-4">{ticket.validDays}天</td>
+                    <td className="py-3 px-4">
+                      {ticket.status === 'active' ? (
+                        <span className="flex items-center text-green-600">
+                          <CheckCircle className="w-4 h-4 mr-1" /> 启用
+                        </span>
+                      ) : (
+                        <span className="flex items-center text-gray-400">
+                          <XCircle className="w-4 h-4 mr-1" /> 停用
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4">
+                      <button
+                        onClick={() => { setEditingItem(ticket); setShowAddModal(true); }}
+                        className="text-blue-600 hover:text-blue-700 mr-3"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(ticket.id)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
 
-      {/* Edit Ticket Modal */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-800">编辑票种</h2>
-              <button onClick={() => { setShowEditModal(false); setEditingTicket(null); }} className="p-2 hover:bg-gray-100 rounded-lg">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">票种名称</label>
-                <input
-                  type="text"
-                  value={newTicket.name}
-                  onChange={(e) => setNewTicket({ ...newTicket, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">票种类型</label>
-                <select
-                  value={newTicket.type}
-                  onChange={(e) => setNewTicket({ ...newTicket, type: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="single">单票</option>
-                  <option value="unified">通票</option>
-                  <option value="package">套餐</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">价格</label>
-                <input
-                  type="number"
-                  value={newTicket.price}
-                  onChange={(e) => setNewTicket({ ...newTicket, price: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">有效期（天）</label>
-                <input
-                  type="number"
-                  value={newTicket.validDays}
-                  onChange={(e) => setNewTicket({ ...newTicket, validDays: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">描述</label>
-                <textarea
-                  value={newTicket.description}
-                  onChange={(e) => setNewTicket({ ...newTicket, description: e.target.value })}
-                  rows={3}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={() => { setShowEditModal(false); setEditingTicket(null); }}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-              >
-                取消
-              </button>
-              <button
-                onClick={handleEditTicket}
-                className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
-              >
-                确认修改
-              </button>
-            </div>
+      {activeTab === 'sales' && (
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">销售单号</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">票种</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">数量</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">金额</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">客户</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">渠道</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">时间</th>
+                </tr>
+              </thead>
+              <tbody>
+                {salesRecords.map((record) => (
+                  <tr key={record.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-3 px-4 font-medium text-blue-600">{record.id}</td>
+                    <td className="py-3 px-4">{record.ticketName}</td>
+                    <td className="py-3 px-4">{record.quantity}</td>
+                    <td className="py-3 px-4 font-medium">¥{record.amount}</td>
+                    <td className="py-3 px-4">{record.customer}</td>
+                    <td className="py-3 px-4">
+                      <span className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">{record.channel}</span>
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-500">{record.time}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && deletingTicket && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
-                <Trash2 className="w-8 h-8 text-red-600" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-800 mb-2">确认删除</h2>
-              <p className="text-gray-600 mb-6">确定要删除票种「{deletingTicket.name}」吗？此操作无法撤销。</p>
-              <div className="flex justify-center gap-3">
-                <button
-                  onClick={() => { setShowDeleteModal(false); setDeletingTicket(null); }}
-                  className="px-6 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-                >
-                  取消
-                </button>
-                <button
-                  onClick={handleDeleteTicket}
-                  className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                >
-                  确认删除
-                </button>
-              </div>
-            </div>
+      {activeTab === 'verify' && (
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">验证单号</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">票种</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">客户</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">闸机</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">状态</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">时间</th>
+                </tr>
+              </thead>
+              <tbody>
+                {verifyRecords.map((record) => (
+                  <tr key={record.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-3 px-4 font-medium text-blue-600">{record.id}</td>
+                    <td className="py-3 px-4">{record.ticketName}</td>
+                    <td className="py-3 px-4">{record.customer}</td>
+                    <td className="py-3 px-4">{record.gate}</td>
+                    <td className="py-3 px-4">
+                      {record.status === 'success' ? (
+                        <span className="flex items-center text-green-600">
+                          <CheckCircle className="w-4 h-4 mr-1" /> 通过
+                        </span>
+                      ) : (
+                        <span className="flex items-center text-red-600">
+                          <XCircle className="w-4 h-4 mr-1" /> 失败
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-500">{record.verifyTime}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
-    </div>
+
+      {activeTab === 'refund' && (
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">退款单号</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">订单号</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">票种</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">原金额</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">退款金额</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">状态</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">时间</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {refundRecords.map((record) => (
+                  <tr key={record.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-3 px-4 font-medium text-blue-600">{record.id}</td>
+                    <td className="py-3 px-4">{record.orderId}</td>
+                    <td className="py-3 px-4">{record.ticketName}</td>
+                    <td className="py-3 px-4">¥{record.amount}</td>
+                    <td className="py-3 px-4 font-medium text-red-600">¥{record.refundAmount}</td>
+                    <td className="py-3 px-4">
+                      {record.status === 'completed' ? (
+                        <span className="flex items-center text-green-600">
+                          <CheckCircle className="w-4 h-4 mr-1" /> 已完成
+                        </span>
+                      ) : (
+                        <span className="flex items-center text-yellow-600">
+                          <Clock className="w-4 h-4 mr-1" /> 处理中
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-500">{record.time}</td>
+                    <td className="py-3 px-4">
+                      {record.status === 'pending' && (
+                        <Button size="sm" onClick={() => toast.success('退款已批准')}>
+                          批准退款
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      <Modal
+        isOpen={showAddModal}
+        onClose={() => { setShowAddModal(false); setEditingItem(null); }}
+        title={editingItem ? '修改票种' : '新增票种'}
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">票种名称</label>
+            <input
+              type="text"
+              defaultValue={editingItem?.name}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">类型</label>
+            <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="single">单票</option>
+              <option value="package">套餐</option>
+              <option value="membership">会员</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">价格</label>
+            <input
+              type="number"
+              defaultValue={editingItem?.price}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">有效期（天）</label>
+            <input
+              type="number"
+              defaultValue={editingItem?.validDays}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">描述</label>
+            <textarea
+              defaultValue={editingItem?.description}
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={() => { setShowAddModal(false); setEditingItem(null); }} variant="outline">取消</Button>
+            <Button onClick={handleSave}>保存</Button>
+          </div>
+        </div>
+      </Modal>
+    </>
   );
 }

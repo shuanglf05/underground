@@ -1,15 +1,14 @@
 import type {
   ApiResponse,
-  Ticket,
-  Member,
-  Order,
+  TicketType,
+  User,
+  TicketOrder,
   Asset,
-  Contract,
-  Bill,
+  LeaseContract,
   Device,
   Announcement,
-  Investment,
-  DashboardStats,
+  InvestmentInfo,
+  DailyReport,
   PaginatedResponse,
   Bracelet,
 } from '../types';
@@ -33,11 +32,11 @@ async function request<T>(url: string, options?: RequestInit): Promise<ApiRespon
 
 // 票务API
 export const ticketApi = {
-  getList: () => request<Ticket[]>('/tickets'),
-  getById: (id: number) => request<Ticket>(`/tickets/${id}`),
-  create: (data: Partial<Ticket>) => request<Ticket>('/tickets', { method: 'POST', body: JSON.stringify(data) }),
-  update: (id: number, data: Partial<Ticket>) => request<Ticket>(`/tickets/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  delete: (id: number) => request<void>(`/tickets/${id}`, { method: 'DELETE' }),
+  getList: () => request<TicketType[]>('/tickets/types'),
+  getById: (id: string) => request<TicketType>(`/tickets/types/${id}`),
+  create: (data: Partial<TicketType>) => request<TicketType>('/tickets/types', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id: string, data: Partial<TicketType>) => request<TicketType>(`/tickets/types/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id: string) => request<void>(`/tickets/types/${id}`, { method: 'DELETE' }),
 };
 
 // 会员API
@@ -48,14 +47,14 @@ export const memberApi = {
     if (params?.pageSize) searchParams.set('pageSize', String(params.pageSize));
     if (params?.keyword) searchParams.set('keyword', params.keyword);
     const query = searchParams.toString();
-    return request<PaginatedResponse<Member>>(`/members${query ? `?${query}` : ''}`);
+    return request<PaginatedResponse<User>>(`/members${query ? `?${query}` : ''}`);
   },
-  getById: (id: number) => request<Member>(`/members/${id}`),
-  getOrders: (id: number) => request<Order[]>(`/members/${id}/orders`),
-  create: (data: Partial<Member>) => request<Member>('/members', { method: 'POST', body: JSON.stringify(data) }),
-  update: (id: number, data: Partial<Member>) => request<Member>(`/members/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  recharge: (id: number, amount: number) => request<Member>(`/members/${id}/recharge`, { method: 'POST', body: JSON.stringify({ amount }) }),
-  updateBalance: (id: number, amount: number) => request<Member>(`/members/${id}/recharge`, { method: 'POST', body: JSON.stringify({ amount }) }),
+  getById: (id: string) => request<User>(`/members/${id}`),
+  getOrders: (id: string) => request<TicketOrder[]>(`/members/${id}/orders`),
+  create: (data: Partial<User>) => request<User>('/members', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id: string, data: Partial<User>) => request<User>(`/members/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  recharge: (id: string, amount: number) => request<User>(`/members/${id}/recharge`, { method: 'POST', body: JSON.stringify({ amount }) }),
+  updateBalance: (id: string, amount: number) => request<User>(`/members/${id}/recharge`, { method: 'POST', body: JSON.stringify({ amount }) }),
 };
 
 // 订单API
@@ -67,15 +66,15 @@ export const orderApi = {
     if (params?.status) searchParams.set('status', params.status);
     if (params?.keyword) searchParams.set('keyword', params.keyword);
     const query = searchParams.toString();
-    return request<PaginatedResponse<Order>>(`/orders${query ? `?${query}` : ''}`);
+    return request<PaginatedResponse<TicketOrder>>(`/orders${query ? `?${query}` : ''}`);
   },
-  getById: (id: number) => request<Order>(`/orders/${id}`),
-  create: (data: { memberId: number; items: { ticketId: number; quantity: number }[] }) =>
-    request<Order>('/orders', { method: 'POST', body: JSON.stringify(data) }),
-  pay: (id: number, payMethod: string) =>
-    request<Order>(`/orders/${id}/pay`, { method: 'POST', body: JSON.stringify({ payMethod }) }),
-  verify: (id: number) => request<Order>(`/orders/${id}/verify`, { method: 'POST' }),
-  refund: (id: number) => request<Order>(`/orders/${id}/refund`, { method: 'POST' }),
+  getById: (id: string) => request<TicketOrder>(`/orders/${id}`),
+  create: (data: { ticketId: string; quantity: number }) =>
+    request<TicketOrder>('/orders', { method: 'POST', body: JSON.stringify(data) }),
+  pay: (id: string, paymentMethod: string) =>
+    request<TicketOrder>(`/orders/${id}/pay`, { method: 'POST', body: JSON.stringify({ paymentMethod }) }),
+  verify: (id: string) => request<TicketOrder>(`/orders/${id}/verify`, { method: 'POST' }),
+  refund: (id: string) => request<TicketOrder>(`/orders/${id}/refund`, { method: 'POST' }),
 };
 
 // 资产API
@@ -89,41 +88,29 @@ export const assetApi = {
     const query = searchParams.toString();
     return request<PaginatedResponse<Asset>>(`/assets${query ? `?${query}` : ''}`);
   },
-  getById: (id: number) => request<Asset>(`/assets/${id}`),
+  getById: (id: string) => request<Asset>(`/assets/${id}`),
   create: (data: Partial<Asset>) => request<Asset>('/assets', { method: 'POST', body: JSON.stringify(data) }),
-  update: (id: number, data: Partial<Asset>) => request<Asset>(`/assets/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  getContracts: (assetId: number) => request<Contract[]>(`/assets/${assetId}/contracts`),
+  update: (id: string, data: Partial<Asset>) => request<Asset>(`/assets/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  getContracts: (assetId: string) => request<LeaseContract[]>(`/assets/${assetId}/contracts`),
   getContractsList: (params?: { page?: number; pageSize?: number; status?: string }) => {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.set('page', String(params.page));
     if (params?.pageSize) searchParams.set('pageSize', String(params.pageSize));
     if (params?.status) searchParams.set('status', params.status);
     const query = searchParams.toString();
-    return request<PaginatedResponse<Contract>>(`/assets/contracts/list${query ? `?${query}` : ''}`);
+    return request<PaginatedResponse<LeaseContract>>(`/assets/contracts/list${query ? `?${query}` : ''}`);
   },
-  createContract: (data: Partial<Contract>) => request<Contract>('/assets/contracts', { method: 'POST', body: JSON.stringify(data) }),
-  getBills: (params?: { page?: number; pageSize?: number; status?: string; contractId?: number }) => {
-    const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.set('page', String(params.page));
-    if (params?.pageSize) searchParams.set('pageSize', String(params.pageSize));
-    if (params?.status) searchParams.set('status', params.status);
-    if (params?.contractId) searchParams.set('contractId', String(params.contractId));
-    const query = searchParams.toString();
-    return request<PaginatedResponse<Bill>>(`/assets/bills/list${query ? `?${query}` : ''}`);
-  },
-  generateBill: (data: { contractId: number; type: string; amount: number; dueDate: string }) =>
-    request<Bill>('/assets/bills', { method: 'POST', body: JSON.stringify(data) }),
-  payBill: (id: number) => request<Bill>(`/assets/bills/${id}/pay`, { method: 'POST' }),
+  createContract: (data: Partial<LeaseContract>) => request<LeaseContract>('/assets/contracts', { method: 'POST', body: JSON.stringify(data) }),
 };
 
 // Dashboard API
 export const dashboardApi = {
-  getStats: () => request<DashboardStats>('/dashboard/stats'),
+  getStats: () => request<DailyReport>('/dashboard/stats'),
   getDeviceStats: () => request<{ online: number; offline: number; error: number; total: number }>('/dashboard/devices/stats'),
   getDevices: () => request<Device[]>('/dashboard/devices'),
-  getAlerts: () => request<{ deviceId: number; deviceName: string; message: string; time: string }[]>('/dashboard/alerts'),
-  getAnnouncements: () => request<Announcement[]>('/dashboard/announcements'),
-  getInvestments: () => request<Investment[]>('/dashboard/investments'),
+  getAlerts: () => request<{ deviceId: string; deviceName: string; message: string; time: string }[]>('/dashboard/alerts'),
+  getAnnouncements: () => request<Announcement[]>('/announcements'),
+  getInvestments: () => request<InvestmentInfo[]>('/investments'),
 };
 
 // 手环API
@@ -136,14 +123,14 @@ export const braceletApi = {
     const query = searchParams.toString();
     return request<PaginatedResponse<Bracelet>>(`/bracelets${query ? `?${query}` : ''}`);
   },
-  getById: (id: number) => request<Bracelet>(`/bracelets/${id}`),
-  issue: (memberId: number, deposit: number) =>
-    request<Bracelet>('/bracelets/issue', { method: 'POST', body: JSON.stringify({ memberId, deposit }) }),
-  return: (id: number) => request<Bracelet>(`/bracelets/${id}/return`, { method: 'POST' }),
-  recharge: (id: number, amount: number) =>
+  getById: (id: string) => request<Bracelet>(`/bracelets/${id}`),
+  issue: (userId: string, deposit: number) =>
+    request<Bracelet>('/bracelets/issue', { method: 'POST', body: JSON.stringify({ userId, deposit }) }),
+  return: (id: string) => request<Bracelet>(`/bracelets/${id}/return`, { method: 'POST' }),
+  recharge: (id: string, amount: number) =>
     request<Bracelet>(`/bracelets/${id}/recharge`, { method: 'POST', body: JSON.stringify({ amount }) }),
-  consume: (id: number, amount: number) =>
+  consume: (id: string, amount: number) =>
     request<Bracelet>(`/bracelets/${id}/consume`, { method: 'POST', body: JSON.stringify({ amount }) }),
-  reportLost: (id: number) => request<Bracelet>(`/bracelets/${id}/lost`, { method: 'POST' }),
+  reportLost: (id: string) => request<Bracelet>(`/bracelets/${id}/lost`, { method: 'POST' }),
   getDepositStats: () => request<{ totalDeposit: number; inUseDeposit: number; availableCount: number }>('/bracelets/stats/deposit'),
 };

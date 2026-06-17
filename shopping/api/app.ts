@@ -23,6 +23,8 @@ import braceletRoutes from './routes/bracelets.js';
 import reportRoutes from './routes/reports.js';
 import userRoutes from './routes/users.js';
 import deviceRoutes from './routes/devices.js';
+import couponRoutes from './routes/coupons.js';
+import announcementRoutes from './routes/announcements.js';
 
 // for esm mode
 const __filename = fileURLToPath(import.meta.url);
@@ -50,6 +52,8 @@ app.use('/api/bracelets', braceletRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/system', userRoutes);
 app.use('/api/devices', deviceRoutes);
+app.use('/api/coupons', couponRoutes);
+app.use('/api/announcements', announcementRoutes);
 
 /**
  * health

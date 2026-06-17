@@ -1,256 +1,290 @@
-// 会员等级枚举
-export enum MemberLevel {
-  NORMAL = 1,
-  SILVER = 2,
-  GOLD = 3,
-  PLATINUM = 4,
-}
-
-// 票种类型枚举
-export enum TicketType {
-  UNIFIED = 'unified',
-  SINGLE = 'single',
-  PACKAGE = 'package',
-}
-
-// 支付状态枚举
-export enum PayStatus {
-  PENDING = 'pending',
-  PAID = 'paid',
-  REFUNDED = 'refunded',
-}
-
-// 订单状态枚举
-export enum OrderStatus {
-  PENDING = 'pending',
-  USED = 'used',
-  CANCELLED = 'cancelled',
-  EXPIRED = 'expired',
-}
-
-// 手环状态枚举
-export enum BraceletStatus {
-  AVAILABLE = 'available',
-  IN_USE = 'in_use',
-  LOST = 'lost',
-  DAMAGED = 'damaged',
-}
-
-// 资产状态枚举
-export enum AssetStatus {
-  AVAILABLE = 'available',
-  RENTED = 'rented',
-  MAINTENANCE = 'maintenance',
-}
-
-// 合同状态枚举
-export enum ContractStatus {
-  ACTIVE = 'active',
-  EXPIRED = 'expired',
-  TERMINATED = 'terminated',
-}
-
-// 账单类型枚举
-export enum BillType {
-  RENT = 'rent',
-  PROPERTY = 'property',
-  UTILITY = 'utility',
-}
-
-// 账单状态枚举
-export enum BillStatus {
-  PENDING = 'pending',
-  PAID = 'paid',
-  OVERDUE = 'overdue',
-}
-
-// 会员接口
-export interface Member {
-  id: number;
-  openid: string;
-  name: string;
+// 用户相关类型
+export interface User {
+  id: string;
   phone: string;
-  level: MemberLevel;
+  nickname: string;
+  avatar: string;
+  openid?: string;
+  memberLevel: number;
+  memberPoints: number;
   balance: number;
-  points: number;
   createdAt: string;
-  updatedAt: string;
 }
 
-// 票种接口
-export interface Ticket {
+// 会员等级
+export interface MemberLevel {
   id: number;
   name: string;
-  type: TicketType;
+  minPoints: number;
+  discount: number;
+  benefits: string[];
+}
+
+// 票种类型
+export interface TicketType {
+  id: string;
+  name: string;
+  description: string;
   price: number;
-  rights: TicketRights;
-  validDays: number;
-  description?: string;
-  status: number;
-  createdAt: string;
+  originalPrice: number;
+  type: 'single' | 'package' | 'annual';
+  category: string;
+  stock: number;
+  sales: number;
+  image: string;
+  validityDays: number;
+  features: string[];
+  status: 'active' | 'inactive';
 }
 
-export interface TicketRights {
-  billiards?: number;
-  vr?: number;
-  trampoline?: number;
-  swimming?: boolean;
-  footBath?: boolean;
-  restaurant?: boolean;
-  movie?: boolean;
-}
-
-// 订单接口
-export interface Order {
-  id: number;
+// 门票订单
+export interface TicketOrder {
+  id: string;
   orderNo: string;
-  memberId: number;
-  memberName?: string;
-  items: OrderItem[];
-  totalAmount: number;
-  payStatus: PayStatus;
-  payMethod?: string;
-  status: OrderStatus;
-  createdAt: string;
-  updatedAt: string;
-}
-
-// 订单明细接口
-export interface OrderItem {
-  id: number;
-  orderId: number;
-  ticketId: number;
-  ticketName?: string;
+  userId: string;
+  ticketId: string;
+  ticketName: string;
   quantity: number;
-  price: number;
-}
-
-// 智能手环接口
-export interface Bracelet {
-  id: number;
-  serialNo: string;
-  status: BraceletStatus;
-  memberId?: number;
-  memberName?: string;
-  balance: number;
-  deposit: number;
+  totalPrice: number;
+  discountAmount: number;
+  payAmount: number;
+  status: 'pending' | 'paid' | 'used' | 'refunded' | 'expired';
+  paymentMethod: string;
   createdAt: string;
+  usedAt?: string;
 }
 
-// 资产接口
+// 用户门票
+export interface UserTicket {
+  id: string;
+  orderId: string;
+  ticketId: string;
+  ticketName: string;
+  qrCode: string;
+  status: 'unused' | 'used' | 'expired';
+  validFrom: string;
+  validTo: string;
+  usedAt?: string;
+  usedLocation?: string;
+}
+
+// 资产类型
 export interface Asset {
-  id: number;
-  code: string;
+  id: string;
   name: string;
-  type: string;
+  type: 'shop' | 'office' | 'warehouse';
   area: number;
-  floor: string;
-  status: AssetStatus;
-  imageUrl?: string;
-  createdAt: string;
+  floor: number;
+  location: string;
+  status: 'available' | 'rented' | 'maintenance';
+  rentPrice: number;
+  images: string[];
+  description: string;
+  facilities: string[];
 }
 
-// 租赁合同接口
-export interface Contract {
-  id: number;
-  assetId: number;
-  assetName?: string;
+// 租赁合同
+export interface LeaseContract {
+  id: string;
+  assetId: string;
   tenantName: string;
-  tenantPhone?: string;
-  rent: number;
-  propertyFee?: number;
+  tenantPhone: string;
   startDate: string;
   endDate: string;
-  status: ContractStatus;
-  createdAt: string;
+  monthlyRent: number;
+  deposit: number;
+  status: 'active' | 'expired' | 'terminated';
 }
 
-// 账单接口
-export interface Bill {
-  id: number;
-  contractId: number;
-  type: BillType;
-  amount: number;
-  dueDate: string;
-  status: BillStatus;
-  paidAt?: string;
-  createdAt: string;
-}
-
-// 系统用户接口
-export interface SystemUser {
-  id: number;
-  username: string;
-  name: string;
-  role: string;
-  phone?: string;
-  email?: string;
-  status: number;
-  createdAt: string;
-}
-
-// 设备接口
+// 设备类型
 export interface Device {
-  id: number;
-  code: string;
+  id: string;
   name: string;
-  type: string;
-  status: 'online' | 'offline' | 'error';
+  type: 'entrance' | 'bracelet' | 'locker' | 'game' | 'vending';
   location: string;
-  lastHeartbeat?: string;
+  status: 'online' | 'offline' | 'maintenance';
+  lastMaintenance: string;
+  nextMaintenance: string;
 }
 
-// 公告接口
+// 维修工单
+export interface MaintenanceOrder {
+  id: string;
+  deviceId: string;
+  deviceName: string;
+  type: 'repair' | 'maintenance' | 'inspection';
+  description: string;
+  images: string[];
+  status: 'pending' | 'accepted' | 'processing' | 'completed';
+  reporter: string;
+  handler?: string;
+  createdAt: string;
+  completedAt?: string;
+}
+
+// 手环
+export interface Bracelet {
+  id: string;
+  code: string;
+  status: 'available' | 'in_use' | 'lost' | 'damaged';
+  userId?: string;
+  deposit: number;
+  balance: number;
+  issuedAt?: string;
+  returnedAt?: string;
+}
+
+// 商品
+export interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  cost: number;
+  stock: number;
+  minStock: number;
+  barcode: string;
+  image: string;
+  status: 'active' | 'inactive';
+}
+
+// 商品订单
+export interface ProductOrder {
+  id: string;
+  orderNo: string;
+  items: OrderItem[];
+  totalPrice: number;
+  discountAmount: number;
+  payAmount: number;
+  paymentMethod: string;
+  status: 'pending' | 'paid' | 'refunded';
+  createdAt: string;
+}
+
+export interface OrderItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  price: number;
+  subtotal: number;
+}
+
+// 公告
 export interface Announcement {
-  id: number;
+  id: string;
   title: string;
   content: string;
-  type: 'info' | 'warning' | 'activity';
-  publishedAt: string;
+  type: 'notice' | 'activity' | 'promotion';
+  image?: string;
   createdAt: string;
 }
 
-// 招租信息接口
-export interface Investment {
-  id: number;
-  assetId: number;
-  assetName?: string;
+// 优惠券
+export interface Coupon {
+  id: string;
+  name: string;
+  type: 'discount' | 'cash';
+  value: number;
+  minAmount: number;
+  validFrom: string;
+  validTo: string;
+  status: 'active' | 'inactive';
+}
+
+// 用户优惠券
+export interface UserCoupon {
+  id: string;
+  couponId: string;
+  couponName: string;
+  status: 'unused' | 'used' | 'expired';
+  usedAt?: string;
+}
+
+// 招商信息
+export interface InvestmentInfo {
+  id: string;
   title: string;
-  description: string;
   area: number;
-  expectedRent?: number;
-  status: 'available' | 'reserved' | 'rented';
+  floor: number;
+  rentPrice: number;
+  location: string;
+  images: string[];
+  description: string;
+  facilities: string[];
+  contactPhone: string;
+  status: 'available' | 'rented';
+}
+
+// 合作意向
+export interface CooperationIntent {
+  id: string;
+  investmentId: string;
+  name: string;
+  phone: string;
+  company?: string;
+  message: string;
+  status: 'pending' | 'contacted' | 'rejected';
   createdAt: string;
 }
 
-// API响应接口
+// 验票记录
+export interface VerifyRecord {
+  id: string;
+  ticketId: string;
+  ticketName: string;
+  userId: string;
+  userName: string;
+  verifyTime: string;
+  location: string;
+  operator: string;
+}
+
+// 交接班记录
+export interface ShiftRecord {
+  id: string;
+  operatorId: string;
+  operatorName: string;
+  startTime: string;
+  endTime: string;
+  totalSales: number;
+  totalOrders: number;
+  cashAmount: number;
+  cardAmount: number;
+  wechatAmount: number;
+  alipayAmount: number;
+  notes: string;
+}
+
+// 日报表
+export interface DailyReport {
+  date: string;
+  totalRevenue: number;
+  totalOrders: number;
+  totalCustomers: number;
+  ticketRevenue: number;
+  productRevenue: number;
+  newMembers: number;
+  refundAmount: number;
+}
+
+// API响应类型
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
-  message?: string;
   error?: string;
+  message?: string;
 }
 
-// 分页参数接口
+// 分页参数
 export interface PaginationParams {
   page: number;
   pageSize: number;
-  total?: number;
 }
 
-// 分页响应接口
+// 分页响应
 export interface PaginatedResponse<T> {
   list: T[];
-  pagination: PaginationParams;
-}
-
-// 统计数据接口
-export interface DashboardStats {
-  todayRevenue: number;
-  todayOrders: number;
-  todayMembers: number;
-  todayVisitors: number;
-  ticketSales: { name: string; value: number }[];
-  revenueByChannel: { name: string; value: number }[];
-  recentOrders: Order[];
+  total: number;
+  page: number;
+  pageSize: number;
 }
